@@ -121,10 +121,10 @@ class PlayerStatisticsManager {
             if (!player.hasPlayedBefore()) {
                 throw new PlayerNotFoundException();
             }
-            return String.valueOf(player.getStatistic(Statistic.TOTAL_WORLD_TIME)*0.05);
+            return String.valueOf(player.getStatistic(Statistic.TOTAL_WORLD_TIME)/20);
         } catch (NullPointerException npe) {
 
-            return String.valueOf(player.getStatistic(Statistic.TOTAL_WORLD_TIME)*0.05);
+                return String.valueOf(player.getStatistic(Statistic.TOTAL_WORLD_TIME)/20);
         }
     }
     public static String getMobKills(String playerName) throws PlayerNotFoundException {
