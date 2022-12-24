@@ -184,14 +184,14 @@ class PlayerStatisticsManager {
             if (!player.hasPlayedBefore()) {
                 throw new PlayerNotFoundException();
             }
-            if (player.isOnline() && !VanishAPI.isInvisible(player.getPlayer())) {
+            if (player.isOnline() && !VanishAPI.isInvisible(Objects.requireNonNull(player.getPlayer()))) {
                 return String.valueOf(0);
             } else {
                 return String.valueOf(System.currentTimeMillis() - player.getLastPlayed());
             }
         } catch (NullPointerException npe) {
 
-            if (player.isOnline() && !VanishAPI.isInvisible(player.getPlayer())) {
+            if (player.isOnline() && !VanishAPI.isInvisible(Objects.requireNonNull(player.getPlayer()))) {
                 return String.valueOf(0);
             } else {
                 return String.valueOf(System.currentTimeMillis() - player.getLastPlayed());
