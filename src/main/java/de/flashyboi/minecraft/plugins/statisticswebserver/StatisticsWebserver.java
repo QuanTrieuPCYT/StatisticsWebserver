@@ -6,7 +6,6 @@ import io.undertow.util.Headers;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.myzelyam.api.vanish.VanishAPI;
@@ -57,50 +56,49 @@ class WebserverManager {
                         String statisticQuery = queryParams.get("stat").element();
                         String response = "";
                         switch (statisticQuery) {
-                            case KILL_QUERY:
+                            case KILL_QUERY -> {
                                 try {
                                     response = PlayerStatisticsManager.getPlayerKills(playerQuery);
                                 } catch (PlayerNotFoundException playerNotFoundException) {
                                     exchange.setStatusCode(404);
                                 }
-                                break;
-                            case DEATH_QUERY:
+                            }
+                            case DEATH_QUERY -> {
                                 try {
                                     response = PlayerStatisticsManager.getPlayerDeaths(playerQuery);
                                 } catch (PlayerNotFoundException playerNotFoundException) {
                                     exchange.setStatusCode(404);
                                 }
-                                break;
-                            case PLAYTIME_QUERY:
+                            }
+                            case PLAYTIME_QUERY -> {
                                 try {
                                     response = PlayerStatisticsManager.getPlayTime(playerQuery);
                                 } catch (PlayerNotFoundException playerNotFoundException) {
                                     exchange.setStatusCode(404);
                                 }
-                                break;
-                            case MOBKILL_QUERY:
+                            }
+                            case MOBKILL_QUERY -> {
                                 try {
                                     response = PlayerStatisticsManager.getMobKills(playerQuery);
                                 } catch (PlayerNotFoundException playerNotFoundException) {
                                     exchange.setStatusCode(404);
                                 }
-                                break;
-                            case LASTPLAYED_QUERY:
+                            }
+                            case LASTPLAYED_QUERY -> {
                                 try {
                                     response = PlayerStatisticsManager.getLastPlayed(playerQuery);
                                 } catch (PlayerNotFoundException playerNotFoundException) {
                                     exchange.setStatusCode(404);
                                 }
-                                break;
-                            case TIMESINCELASTONLINE_QUERY:
+                            }
+                            case TIMESINCELASTONLINE_QUERY -> {
                                 try {
                                     response = PlayerStatisticsManager.getTimeSinceLastOnline(playerQuery);
                                 } catch (PlayerNotFoundException playerNotFoundException) {
                                     exchange.setStatusCode(404);
                                 }
-                                break;
-                            default:
-                                exchange.setStatusCode(400);
+                            }
+                            default -> exchange.setStatusCode(400);
                         }
                         exchange.getResponseSender()
                                 .send(response);
