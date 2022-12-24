@@ -6,8 +6,10 @@ import io.undertow.util.Headers;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import de.myzelyam.api.vanish.VanishAPI;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -184,14 +186,14 @@ class PlayerStatisticsManager {
             if (!player.hasPlayedBefore()) {
                 throw new PlayerNotFoundException();
             }
-            if (player.isOnline()) {
+            if (player.isOnline() && !VanishAPI.isInvisible(player.getPlayer())) {
                 return String.valueOf(0);
             } else {
                 return String.valueOf(System.currentTimeMillis() - player.getLastPlayed());
             }
         } catch (NullPointerException npe) {
 
-            if (player.isOnline()) {
+            if (player.isOnline() && !VanishAPI.isInvisible(player.getPlayer())) {
                 return String.valueOf(0);
             } else {
                 return String.valueOf(System.currentTimeMillis() - player.getLastPlayed());

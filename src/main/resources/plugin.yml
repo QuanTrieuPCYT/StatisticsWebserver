@@ -4,3 +4,4 @@ main: de.flashyboi.minecraft.plugins.statisticswebserver.StatisticsWebserver
 api-version: 1.18
 authors: [ flash_btw ]
 website: https://flash-codes.de
+depend: [ SuperVanish ]

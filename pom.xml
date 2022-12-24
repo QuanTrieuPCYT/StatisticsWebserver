@@ -87,6 +87,10 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -100,6 +104,12 @@
             <groupId>io.undertow</groupId>
             <artifactId>undertow-core</artifactId>
             <version>2.2.17.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.LeonMangler</groupId>
+            <artifactId>SuperVanish</artifactId>
+            <version>6.2.6-4</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
