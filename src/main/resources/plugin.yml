@@ -1,7 +1,7 @@
 name: StatisticsWebserver
 version: '${project.version}'
 main: de.flashyboi.minecraft.plugins.statisticswebserver.StatisticsWebserver
-api-version: 1.18
+api-version: 1.17
 authors: [ flash_btw ]
 website: https://flash-codes.de
-depend: [ SuperVanish ]
+depend: [ SuperVanish, SuperiorSkyblock2 ]
