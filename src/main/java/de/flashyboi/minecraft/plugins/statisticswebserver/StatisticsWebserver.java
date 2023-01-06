@@ -9,6 +9,7 @@ import org.bukkit.Statistic;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.myzelyam.api.vanish.VanishAPI;
+import org.json.JSONObject;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -38,71 +39,23 @@ public final class StatisticsWebserver extends JavaPlugin {
 }
 
 class WebserverManager {
-    private static final String KILL_QUERY = "kills";
-    private static final String DEATH_QUERY = "deaths";
-    private static final String PLAYTIME_QUERY = "playtime";
-    private static final String MOBKILL_QUERY = "mobkills";
-    private static final String LASTPLAYED_QUERY = "lastplayed";
-    private static final String TIMESINCELASTONLINE_QUERY = "timesincelastonline";
     protected static void startWebserver(int port, String host) {
         Undertow server = Undertow.builder()
                 .addHttpListener(port, host)
                 .setHandler(exchange -> {
                     exchange.getResponseHeaders()
-                            .put(Headers.CONTENT_TYPE, "text/html");
+                            .put(Headers.CONTENT_TYPE, "application/json");
                     Map<String, Deque<String>> queryParams = exchange.getQueryParameters();
                     try {
                         String playerQuery = queryParams.get("player").element();
-                        String statisticQuery = queryParams.get("stat").element();
                         String response = "";
-                        switch (statisticQuery) {
-                            case KILL_QUERY -> {
-                                try {
-                                    response = PlayerStatisticsManager.getPlayerKills(playerQuery);
-                                } catch (PlayerNotFoundException playerNotFoundException) {
-                                    exchange.setStatusCode(404);
-                                }
-                            }
-                            case DEATH_QUERY -> {
-                                try {
-                                    response = PlayerStatisticsManager.getPlayerDeaths(playerQuery);
-                                } catch (PlayerNotFoundException playerNotFoundException) {
-                                    exchange.setStatusCode(404);
-                                }
-                            }
-                            case PLAYTIME_QUERY -> {
-                                try {
-                                    response = PlayerStatisticsManager.getPlayTime(playerQuery);
-                                } catch (PlayerNotFoundException playerNotFoundException) {
-                                    exchange.setStatusCode(404);
-                                }
-                            }
-                            case MOBKILL_QUERY -> {
-                                try {
-                                    response = PlayerStatisticsManager.getMobKills(playerQuery);
-                                } catch (PlayerNotFoundException playerNotFoundException) {
-                                    exchange.setStatusCode(404);
-                                }
-                            }
-                            case LASTPLAYED_QUERY -> {
-                                try {
-                                    response = PlayerStatisticsManager.getLastPlayed(playerQuery);
-                                } catch (PlayerNotFoundException playerNotFoundException) {
-                                    exchange.setStatusCode(404);
-                                }
-                            }
-                            case TIMESINCELASTONLINE_QUERY -> {
-                                try {
-                                    response = PlayerStatisticsManager.getTimeSinceLastOnline(playerQuery);
-                                } catch (PlayerNotFoundException playerNotFoundException) {
-                                    exchange.setStatusCode(404);
-                                }
-                            }
-                            default -> exchange.setStatusCode(400);
+                        try {
+                            response = PlayerStatisticsManager.response(playerQuery);
+                        } catch (PlayerNotFoundException playerNotFoundException) {
+                            exchange.setStatusCode(404);
                         }
                         exchange.getResponseSender()
                                 .send(response);
-
                     } catch (IllegalArgumentException | NullPointerException e) {
                         exchange.setStatusCode(400);
                     }
@@ -113,89 +66,37 @@ class WebserverManager {
 }
 
 class PlayerStatisticsManager {
-    public static String getPlayerKills(String playerName) throws PlayerNotFoundException {
+    public static String response(String playerName) throws PlayerNotFoundException {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         try {
             if (!player.hasPlayedBefore()) {
                 throw new PlayerNotFoundException();
             }
-            return String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS));
+            return JSONMaker.json(playerName);
         } catch (NullPointerException npe) {
-
-            return String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS));
+            return JSONMaker.json(playerName);
         }
     }
+}
 
-    public static String getPlayerDeaths(String playerName) throws PlayerNotFoundException {
+class JSONMaker {
+    public static String json(String playerName) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
-        try {
-            if (!player.hasPlayedBefore()) {
-                throw new PlayerNotFoundException();
-            }
-            return String.valueOf(player.getStatistic(Statistic.DEATHS));
-        } catch (NullPointerException npe) {
-
-            return String.valueOf(player.getStatistic(Statistic.DEATHS));
-        }
+        JSONObject playerresponse = new JSONObject();
+        playerresponse.put("kills", String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS)));
+        playerresponse.put("deaths", String.valueOf(player.getStatistic(Statistic.DEATHS)));
+        playerresponse.put("mobkills", String.valueOf(player.getStatistic(Statistic.MOB_KILLS)));
+        playerresponse.put("lastplayed", String.valueOf(player.getLastPlayed()));
+        playerresponse.put("playtime", String.valueOf(player.getStatistic(Statistic.TOTAL_WORLD_TIME)/20));
+        playerresponse.put("timesincelastonline", JSONMaker.getTimeSinceLastOnline(playerName));
+        return playerresponse.toString();
     }
-
-    public static String getPlayTime(String playerName) throws PlayerNotFoundException {
-        OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
-        try {
-            if (!player.hasPlayedBefore()) {
-                throw new PlayerNotFoundException();
-            }
-            return String.valueOf(player.getStatistic(Statistic.TOTAL_WORLD_TIME)/20);
-        } catch (NullPointerException npe) {
-
-                return String.valueOf(player.getStatistic(Statistic.TOTAL_WORLD_TIME)/20);
-        }
-    }
-    public static String getMobKills(String playerName) throws PlayerNotFoundException {
-        OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
-        try {
-            if (!player.hasPlayedBefore()) {
-                throw new PlayerNotFoundException();
-            }
-            return String.valueOf(player.getStatistic(Statistic.MOB_KILLS));
-        } catch (NullPointerException npe) {
-
-            return String.valueOf(player.getStatistic(Statistic.MOB_KILLS));
-        }
-    }
-    public static String getLastPlayed(String playerName) throws PlayerNotFoundException {
-        OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
-        try {
-            if (!player.hasPlayedBefore()) {
-                throw new PlayerNotFoundException();
-            }
-            return String.valueOf(player.getLastPlayed());
-        } catch (NullPointerException npe) {
-
-            return String.valueOf(player.getLastPlayed());
-        }
-    }
-    public static String getTimeSinceLastOnline(String playerName) throws PlayerNotFoundException {
-        // This one is a bit more tricky
-        // As Bukkit only return the last time the player was logged in, not in real time,
-        // we need to return this with the value of 0 if the player is online
-        OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
-        try {
-            if (!player.hasPlayedBefore()) {
-                throw new PlayerNotFoundException();
-            }
-            if (player.isOnline() && !VanishAPI.isInvisible(Objects.requireNonNull(player.getPlayer()))) {
-                return String.valueOf(0);
-            } else {
-                return String.valueOf(System.currentTimeMillis() - player.getLastPlayed());
-            }
-        } catch (NullPointerException npe) {
-
-            if (player.isOnline() && !VanishAPI.isInvisible(Objects.requireNonNull(player.getPlayer()))) {
-                return String.valueOf(0);
-            } else {
-                return String.valueOf(System.currentTimeMillis() - player.getLastPlayed());
-            }
+    private static String getTimeSinceLastOnline(String playerlastonlineName) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(playerlastonlineName);
+        if (player.isOnline() && !VanishAPI.isInvisible(Objects.requireNonNull(player.getPlayer()))) {
+            return String.valueOf(0);
+        } else {
+            return String.valueOf(System.currentTimeMillis() - player.getLastPlayed());
         }
     }
 }
