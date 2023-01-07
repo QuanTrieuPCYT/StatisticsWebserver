@@ -83,20 +83,20 @@ class JSONMaker {
     public static String json(String playerName) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
         JSONObject playerresponse = new JSONObject();
-        playerresponse.put("kills", String.valueOf(player.getStatistic(Statistic.PLAYER_KILLS)));
-        playerresponse.put("deaths", String.valueOf(player.getStatistic(Statistic.DEATHS)));
-        playerresponse.put("mobkills", String.valueOf(player.getStatistic(Statistic.MOB_KILLS)));
-        playerresponse.put("lastplayed", String.valueOf(player.getLastPlayed()));
-        playerresponse.put("playtime", String.valueOf(player.getStatistic(Statistic.TOTAL_WORLD_TIME)/20));
+        playerresponse.put("kills", player.getStatistic(Statistic.PLAYER_KILLS));
+        playerresponse.put("deaths", player.getStatistic(Statistic.DEATHS));
+        playerresponse.put("mobkills", player.getStatistic(Statistic.MOB_KILLS));
+        playerresponse.put("lastplayed", player.getLastPlayed());
+        playerresponse.put("playtime", player.getStatistic(Statistic.TOTAL_WORLD_TIME)/20);
         playerresponse.put("timesincelastonline", JSONMaker.getTimeSinceLastOnline(playerName));
         return playerresponse.toString();
     }
-    private static String getTimeSinceLastOnline(String playerlastonlineName) {
+    private static Long getTimeSinceLastOnline(String playerlastonlineName) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerlastonlineName);
         if (player.isOnline() && !VanishAPI.isInvisible(Objects.requireNonNull(player.getPlayer()))) {
-            return String.valueOf(0);
+            return Long.valueOf("0");
         } else {
-            return String.valueOf(System.currentTimeMillis() - player.getLastPlayed());
+            return Long.valueOf(System.currentTimeMillis() - player.getLastPlayed());
         }
     }
 }
